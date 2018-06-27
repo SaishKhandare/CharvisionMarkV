@@ -3,6 +3,7 @@ package com.example.saish.charvisionmarkv;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.StrictMode;
+import android.util.Log;
 
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -28,6 +29,9 @@ public class GoogleVision {
 
 
     static String data = "", textword = "";
+    static StringBuilder dataBuild  = new StringBuilder();
+
+
 
     static int nametrap = 0; //used to append few words after "name" to String "namev"
     static int totaltrap = 0; //used to append few words after "total" to String "totalv"
@@ -44,10 +48,12 @@ public class GoogleVision {
     static String[] namearr = new String[]{"name"};
     static String[] totalarr = new String[]{"total"};
 
-    static int Trap=0;
+    static int isTrapNumber=0;
+    static int TrapNumber =0;
 
 
     public static String Run_OCR(Context context, Bitmap picture) {
+
 
 
         data ="";
@@ -108,59 +114,28 @@ public class GoogleVision {
                                     textword = textword + symbol.getText();
                                 }
 
-                                //trap for name:--saving names till customer----------------------------------------------------------------------------------
-                                if(textword.trim().toLowerCase().equals("customer"))
-                                {
-                                    nametrap = 0;
-                                }
-                                if (nametrap >= 1) {
-                                    namev = namev + " "  + textword;
-                                }
 
-                                //sets the trap for name:
-                                name_trap(textword);
-                                // trap for name ends:-------------------------------------------------------------------------------------------------------------
+                                textword = textword + " ";
+                                dataBuild.append(textword);
 
-                                // trap for total:------------------------------------------------------------------------------------------------------------
-                                if(textword.trim().toLowerCase().equals("shop") || textword.trim().toLowerCase().equals("/") )
-                                {
-                                    totaltrap = 0;
-                                }
-                                if (totaltrap >= 1) {
-                                    totalv = totalv + " " + textword;
-                                }
-                                //sets trap for total
-                                total_trap(textword);
-                                //Trap for total ends here-------------------------------------------------------------------------------------------------
-
-
-                                //Trapper block starts here--------------------------------------------------------------------------------------------------------------
-                                trap_between(textword,"NO",".");
-                                if(Trap == 1)
-                                {
-                                    numberv = numberv + " " + textword;
-                                    Trap = 0;
-                                }
-
-
-
-
-
-                                data = data + "\n\n";
-                                data = data + textword + word.getBoundingBox();
-                                data = data + "\n";
+                               // data = data + "\n\n";
+                               // data = data + textword ;
+                                //data = data + "\n";
                                 textword = "";
                             }
                         }
                     }
                 }
 
-                data = data + "\n NAME:" + namev;
-                data = data + "\n TOTAL" + totalv;
-                data = data  + "\n NUMBER " + numberv;
-                data = (data + "\n NAME TRAP : " + istrapedname);
-                data = (data + "\n TOTAL TRAP : " + istrapedtotal);
+               // data = data + "\n NAME:" + namev;
+               // data = data + "\n TOTAL" + totalv;
+               // data = data  + "\n NUMBER " + numberv;
+               // data = (data + "\n NAME TRAP : " + istrapedname);
+               // data = (data + "\n TOTAL TRAP : " + istrapedtotal);
 
+                data = dataBuild.toString();
+                data = data + "\n\n NUMBER::" +Refiner.getField("CUSTOMER NO :",data,3);
+                data = data + "\n TOTAL::" + Refiner.getField("TOTAL",data,4);
                 return data;
 
             } catch (IOException e) {
@@ -173,6 +148,8 @@ public class GoogleVision {
 
         return "ERROR SDK < 8";
     }
+
+
 
 
     //FUNCTION TO TRAP NAME uses name_condition
@@ -234,19 +211,144 @@ public class GoogleVision {
 
     //GENRAL FUNCTION TO TRAP WORDS BETWEEN TWO KEYWORDS
     //This functions works with trapper block.
-    public static void trap_between(String word, String Start, String End)
+    public static void trap_between(String word, String first, String Second)
     {
-        if(word.equals(Start))
+        if(word.equals(first))
         {
-            Trap =1; //SET the Trap
+            isTrapNumber =1; //SET the Trap
         }
-        else if(word.equals(End))
-        {
-            Trap = 0; //RESET the Trap
-        }
+        //if(Trap == 1 && )
+
 
     }
 
+    public static Boolean cmp (String word, String equate)
+    {
+        if(word.trim().toLowerCase().equals(equate))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /*
+                                //trap for name:--saving names till customer----------------------------------------------------------------------------------
+                                if(textword.trim().toLowerCase().equals("customer"))
+                                {
+                                    nametrap = 0;
+                                }
+                                if (nametrap >= 1) {
+                                    namev = namev + " "  + textword;
+                                }
+
+                                //sets the trap for name:
+                                name_trap(textword);
+                                // trap for name ends:-------------------------------------------------------------------------------------------------------------
+
+                                // trap for total:------------------------------------------------------------------------------------------------------------
+                                if(textword.trim().toLowerCase().equals("shop") || textword.trim().toLowerCase().equals("/") )
+                                {
+                                    totaltrap = 0;
+                                }
+                                if (totaltrap >= 1) {
+                                    totalv = totalv + " " + textword;
+                                }
+                                //sets trap for total
+                                total_trap(textword);
+                                //Trap for total ends here-------------------------------------------------------------------------------------------------
+
+
+                                //Trapper block starts here--------------------------------------------------------------------------------------------------------------
+                                if(cmp(textword,"customer") || isTrapNumber==1)
+                                {
+                                    isTrapNumber = 1;
+                                    if(cmp(textword,"no"))
+                                    {
+                                        TrapNumber = 4;
+                                    }
+                                }
+
+                                if(TrapNumber >= 1)
+                                {
+                                    numberv = numberv + textword;
+                                    TrapNumber = TrapNumber -1;
+                                }
+                                //------------------------------------------------------------------------------------------------------------------------------------
+
+                                */
 
 

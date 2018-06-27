@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     public void finaliseData() {
         data = data + " \n ABOVE ARE THE RESULTS";
         textview.setText(data);
+        data = "";
     }
 
     //FUNCTION TO GET APPROPRIATE SIZE OF IMAGE
